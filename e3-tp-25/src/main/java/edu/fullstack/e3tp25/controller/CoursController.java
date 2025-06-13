@@ -2,6 +2,7 @@ package edu.fullstack.e3tp25.controller;
 
 import edu.fullstack.e3tp25.dao.CoursDao;
 import edu.fullstack.e3tp25.model.Cours;
+import edu.fullstack.e3tp25.service.CoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,9 @@ public class CoursController {
         this.coursDao = coursDao;
     }
 
+    @Autowired
+    private CoursService coursService;
+
     @GetMapping("/liste")
     public ResponseEntity<List<Cours>> getAll() {
         return ResponseEntity.ok(coursDao.findAll());
@@ -39,9 +43,13 @@ public class CoursController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Cours> add(@RequestBody Cours cours) {
-        coursDao.save(cours);
-        return new ResponseEntity<>(cours, HttpStatus.CREATED);
+    public ResponseEntity<?> add(@RequestBody Cours cours) {
+        try {
+            Cours saved = coursService.ajouterCours(cours);
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
