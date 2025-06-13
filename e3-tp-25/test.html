@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <input id="datetime-picker" type="datetime-local">
+    <input id="date-picker" type="date">
+    <button id="test-button">Test</button>
+
+    <script>
+        const datetimePicker = document.querySelector("#datetime-picker")
+        const datePicker = document.querySelector("#date-picker")
+        const testButton = document.querySelector("#test-button")
+
+        testButton.addEventListener("click", () => {
+            console.log("date picker value", datePicker.value)
+            // console.log("date picker value ISO", datePicker.value.toISOString())
+            console.log("date picker value local", datePicker.value.toLocaleString())
+
+            console.log("date picker value", datetimePicker.value)
+            console.log("date picker value ISO", datetimePicker.value.toISOString())
+            console.log("date picker value local date", datetimePicker.value.toLocaleDateString())
+            console.log("date picker value local time", datetimePicker.value.toLocaleTimeString())
+
+        })
+    </script>
+</body>
+</html>
