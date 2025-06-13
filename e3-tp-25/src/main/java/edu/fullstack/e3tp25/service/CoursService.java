@@ -1,39 +1,49 @@
 package edu.fullstack.e3tp25.service;
 
 import edu.fullstack.e3tp25.dao.CoursDao;
-import edu.fullstack.e3tp25.dao.SalleDao;
-import edu.fullstack.e3tp25.model.Cours;
-import edu.fullstack.e3tp25.model.Etudiant;
+import edu.fullstack.e3tp25.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class CoursService {
 
-    @Autowired
-    private CoursDao coursDao;
+    private final CoursDao coursDao;
 
     @Autowired
-    private SalleDao salleDao;
+    public CoursService(CoursDao coursDao) {
+        this.coursDao = coursDao;
+    }
 
-    public Cours ajouterCours(Cours cours) {
-        // Vérification conflits professeurs
-        boolean conflitProf = coursDao.existsByProfesseurAndHoraire(cours.getProfesseur(), cours.getDebut(), cours.getFin());
-        if (conflitProf) throw new RuntimeException("Le professeur a déjà un cours à cette période");
+    public Cours creerCours(Cours cours) throws IllegalArgumentException {
+        LocalDateTime debut = cours.getDebut();
+        LocalDateTime fin = cours.getFin();
 
-        // Vérification conflits étudiants
-        for (Etudiant etudiant : cours.getEtudiantList()) {
-            boolean conflit = coursDao.existsByEtudiantAndHoraire(etudiant, cours.getDebut(), cours.getFin());
-            if (conflit) throw new RuntimeException("L'étudiant " + etudiant.getId() + " a déjà un cours");
+        // Vérification disponibilité professeur
+        if (coursDao.existsByProfesseurAndHoraire(cours.getProfesseur(), debut, fin)) {
+            throw new IllegalArgumentException("Le professeur a déjà un cours à cette période.");
         }
 
-        // Si présentiel
-        if (cours.getSalle() != null) {
-            boolean salleOccupee = coursDao.existsBySalleAndHoraire(cours.getSalle(), cours.getDebut(), cours.getFin());
-            if (salleOccupee) throw new RuntimeException("Salle occupée");
+        // Vérification disponibilité étudiants
+        for (Etudiant e : cours.getEtudiantList()) {
+            if (coursDao.existsByEtudiantAndHoraire(e, debut, fin)) {
+                throw new IllegalArgumentException("Un étudiant a déjà un cours à cette période.");
+            }
+        }
 
-            if (cours.getEtudiantList().size() > cours.getSalle().getCapacite())
-                throw new RuntimeException("Trop d'étudiants pour cette salle");
+        // Si c’est un cours en présentiel, on vérifie salle et capacité
+        if (cours instanceof Presentiel presentiel) {
+            Salle salle = presentiel.getSalle();
+
+            if (coursDao.existsBySalleAndHoraire(salle, debut, fin)) {
+                throw new IllegalArgumentException("La salle est déjà occupée.");
+            }
+
+            if (presentiel.getEtudiantList().size() > salle.getCapacite()) {
+                throw new IllegalArgumentException("Le nombre d'étudiants dépasse la capacité de la salle.");
+            }
         }
 
         return coursDao.save(cours);

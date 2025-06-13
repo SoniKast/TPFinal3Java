@@ -33,7 +33,4 @@ public class Cours {
     protected LocalDateTime debut;
 
     protected LocalDateTime fin;
-
-    @ManyToOne(optional = false)
-    protected Salle salle;
 }

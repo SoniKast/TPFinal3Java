@@ -45,7 +45,7 @@ public class CoursController {
     @PostMapping("")
     public ResponseEntity<?> add(@RequestBody Cours cours) {
         try {
-            Cours saved = coursService.ajouterCours(cours);
+            Cours saved = coursService.creerCours(cours);
             return new ResponseEntity<>(saved, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
