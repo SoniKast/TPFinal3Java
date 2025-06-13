@@ -30,6 +30,10 @@ class CoursControllerTest {
 
     @Autowired private ObjectMapper objectMapper;
 
+    @Autowired private ProfesseurDao professeurDao;
+    @Autowired private EtudiantDao etudiantDao;
+    @Autowired private SalleDao salleDao;
+
     @BeforeEach
     public void init() {
         mvc = webAppContextSetup(context)
@@ -44,15 +48,18 @@ class CoursControllerTest {
         professeur.setEmail("professeur@gmail.com");
         professeur.setPassword("root");
         professeur.setAnneesExperience(10);
+        professeur = professeurDao.save(professeur);
 
         Etudiant etudiant = new Etudiant();
         etudiant.setEmail("etudiant@gmail.com");
         etudiant.setPassword("root");
         etudiant.setDateNaissance(LocalDate.parse("2004-11-18"));
+        etudiant = etudiantDao.save(etudiant);
 
         Salle salle = new Salle();
         salle.setNom("Salle A");
         salle.setCapacite(10);
+        salle = salleDao.save(salle);
 
         cours.setNom("Maths");
         cours.setDebut(LocalDateTime.now().plusDays(1));
@@ -73,18 +80,21 @@ class CoursControllerTest {
         Presentiel cours1 = new Presentiel();
 
         Professeur professeur = new Professeur();
-        professeur.setEmail("professeur@gmail.com");
+        professeur.setEmail("professeur2@gmail.com");
         professeur.setPassword("root");
         professeur.setAnneesExperience(10);
+        professeur = professeurDao.save(professeur);
 
         Etudiant etudiant = new Etudiant();
-        etudiant.setEmail("etudiant@gmail.com");
+        etudiant.setEmail("etudiant2@gmail.com");
         etudiant.setPassword("root");
         etudiant.setDateNaissance(LocalDate.parse("2004-11-18"));
+        etudiant = etudiantDao.save(etudiant);
 
         Salle salle = new Salle();
-        salle.setNom("Salle A");
+        salle.setNom("Salle B");
         salle.setCapacite(10);
+        salle = salleDao.save(salle);
 
         cours1.setNom("Java");
         cours1.setDebut(LocalDateTime.of(2025, 6, 20, 10, 0));
